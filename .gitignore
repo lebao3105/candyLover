@@ -1,0 +1,12 @@
+build/
+.xmake/
+*.o
+*.dylib
+*.dll
+*.a
+*.so*
+
+config.json
+.env
+*.log
+*.lua
