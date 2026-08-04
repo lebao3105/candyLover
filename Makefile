@@ -4,6 +4,7 @@ BUILD_DIR=build
 MODE=debug
 CFLAGS=-Iinclude -I3rdparty/concord/include \
 	   -I3rdparty/concord/core -I3rdparty/concord/gencodecs \
+	   -I3rdparty/concord/generated -I3rdparty/concord/reflect-c \
 	   $(shell pkg-config --cflags libcurl) \
 	   $(shell pkg-config --cflags lua) \
 	   -Wall -Wextra -Wpedantic -std=c23
@@ -28,7 +29,7 @@ CFLAGS+=-O3
 endif
 
 soc: $(OBJS)
-	$(MAKE) -C 3rdparty/concord static
+	$(MAKE) -C 3rdparty/concord all static
 	$(CC) $(OBJS) -o build/soc $(LIBS)
 
 compile_commands:
