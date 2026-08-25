@@ -1,14 +1,21 @@
 #include "swiss.h"
+#include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 
-const char *vFormat(const char *fmt, va_list args)
+const char *vFormat(const char *fmt, ...)
 {
-    int sz = vsprintf(nullptr, fmt, args);
+    va_list args, args2;
+    va_start(args, fmt);
+    va_copy(args2, args);
+    size_t sz = vsnprintf(0, 0, fmt, args2);
+    va_end(args2);
     assert(sz > 0 && "vFormat() failed");
 
-    char result[sz] = {};
+    char *result = (char*)malloc(sz);
     vsnprintf(result, sz, fmt, args);
-    return strdup(result);
+    va_end(args);
+    return result;
 }
