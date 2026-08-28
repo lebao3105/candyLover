@@ -13,6 +13,7 @@
 #include "dsl/dsl.h"
 #include "dsl/env.h"
 #include "slash.h"
+#include "features/ban.h"
 #include "features/count.h"
 #include <lua.h> // LUA_VERSION, lua_close
 #include <lualib.h> // luaopen_*
@@ -27,12 +28,16 @@ void on_ready(struct discord *client,
     logmod_log(INFO, nullptr, "Hello world from %s#%s!",
                event->user->username, event->user->discriminator);
     create_game_slash_commands(client);
+    create_ban_slash_command(client);
 }
 
 void onMessage(struct discord *client, const struct discord_message *event)
 {
     if (event->interaction || event->author->bot) return;
-    if (event->channel_id == number_count)
+
+    if (event->channel_id == trapboy)
+        on_trap_trigger(client, event);
+    else if (event->channel_id == number_count)
         on_count_message(client, event);
 }
 

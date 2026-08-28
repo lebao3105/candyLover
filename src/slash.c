@@ -1,6 +1,8 @@
 #include "slash.h"
-#include "features/count.h"
 #include "dsl/env.h"
+#include "features/count.h"
+#include "features/ban.h"
+
 #include <libintl.h>
 #include <string.h>
 
@@ -81,4 +83,73 @@ void on_game_interaction_create(struct discord *client, const struct discord_int
             on_count_command(client, interaction);
         }
     }
+}
+
+void create_ban_slash_command(struct discord *client)
+{
+    struct discord_application_command_option_choice actions[] = {
+        { .name = _("Ban"), .value = "\"ban\"" },
+        { .name = _("Unban"), .value = "\"unban\"" },
+        { .name = _("Kick"), .value = "\"kick\"" },
+    };
+    struct discord_application_command_option options[] = {
+        {
+            .type = DISCORD_APPLICATION_OPTION_NUMBER,
+            .name = _("name"),
+            .description = _("User ID"),
+            .required = true,
+        },
+        {
+            .type = DISCORD_APPLICATION_OPTION_STRING,
+            .name = _("action"),
+            .description = _("What to do"),
+            .choices = &(struct discord_application_command_option_choices){
+                .size = sizeof actions / sizeof *actions,
+                .array = actions
+            },
+            .required = true
+        }
+    };
+    struct discord_create_global_application_command params = {
+        .name = "game",
+        .description = _("Query, start, reset or modify games"),
+        .default_permission = true,
+        .options = &(struct discord_application_command_options) {
+            .size = sizeof(options) / sizeof *options,
+            .array = options
+        }
+    };
+    discord_create_global_application_command(client, botID, &params, nullptr);
+    discord_set_on_interaction_create(client, &on_game_interaction_create);
+    logmod_log(INFO, nullptr, "Created slash commands!");
+}
+
+void on_ban_interaction_create(struct discord *client, const struct discord_interaction *interaction)
+{
+    if ((interaction->type != DISCORD_INTERACTION_APPLICATION_COMMAND) ||
+        !interaction->data || !interaction->data->options) return;
+
+    struct ban_params params;
+    char *action = nullptr;
+
+    for (int i = 0; i < interaction->data->options->size; ++i)
+    {
+        char *nm = interaction->data->options->array[i].name;
+        char *vl = interaction->data->options->array[i].value;
+
+        if (strcmp(nm, _("name")) == 0)
+            sscanf(vl, "%" SCNu64, &params.targetID);
+        else if (strcmp(nm, _("action")) == 0)
+            action = vl;
+
+        if (params.targetID > 0ULL && action) break;
+    }
+
+    if (strcmp(action, "unban") != 0)
+    {
+        params.kick = strcmp(action, "kick") == 0;
+        on_ban_command(client, interaction, &params);
+    }
+    else
+        on_unban_command(client, interaction, &params);
 }
