@@ -1,15 +1,11 @@
 #pragma once
 
+#include "types.h"
 #include <lua.h>
-
-#define CREATE_DSL_SCOPE_VAL \
-    static bool SCOPE = false
 
 #define ASSERT_IN_SCOPE(name) \
     if (!SCOPE) \
         luaL_error(L, "This function is called outside " #name " scope", nullptr)
-
-#define SET_IN_SCOPE(val) SCOPE = val
 
 #define REGISTER_C_FUNCTION(name) \
     lua_register(L, #name, & name);
@@ -18,8 +14,11 @@
     if (lua_gettop(L) > n) \
         lua_warning(L, #name "() needs only " #n " arguments", 0)
 
-extern char *scopes[];
+
+typedef enum { UNSET, ENV, COUNTER, TRAPBOY, WORDHUNT, WORDCHAIN } scopes_t;
+extern scopes_t SCOPE;
 extern struct lua_State *Lua;
 
-void DSL_load_file(const char *path);
+bool DSL_load_file(const char *path);
 void DSL_global_init(struct lua_State *L);
+u64snowflake DSL_set_integer(struct lua_State *L);

@@ -1,5 +1,10 @@
 build/
 .xmake/
+.vs/
+.idea/
+.cache/
+.vscode/
+
 *.o
 *.dylib
 *.dll
