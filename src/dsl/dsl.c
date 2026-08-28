@@ -15,14 +15,14 @@ int include(struct lua_State *L)
     WARN_TOO_MANY_ARGS(1, include);
     else if (lua_gettop(L) == 0)
     {
-        luaL_error(L, "include() needs ONE argument!", nullptr);
+        luaL_error(L, _("include() needs ONE argument!"), nullptr);
         goto done;
     }
 
     const char *path = luaL_checkstring(L, 1);
     if (path == nullptr || strlen(path) == 0)
     {
-        luaL_error(L, "Empty path", nullptr);
+        luaL_error(L, _("Empty path"), nullptr);
         goto done;
     }
 
@@ -70,19 +70,19 @@ void DSL_global_init(lua_State *L)
 
 bool DSL_load_file(const char *path)
 {
-    logmod_log(INFO, nullptr, "Bắt đầu đọc %s", path);
+    logmod_log(INFO, nullptr, "Reading %s", path);
     if (luaL_loadfile(Lua, path) == LUA_OK)
     {
         if (lua_pcall(Lua, 0, LUA_MULTRET, 0) == LUA_OK)
         {
-            logmod_log(INFO, nullptr, "Đọc %s thành công", path);
+            logmod_log(INFO, nullptr, "Successfully read %s", path);
             return true;
         }
         else
-            logmod_log(ERROR, nullptr, "Lỗi chạy file %s: %s", path, lua_tostring(Lua, -1));
+            logmod_log(ERROR, nullptr, "Error running %s: %s", path, lua_tostring(Lua, -1));
     }
     else
-        logmod_log(ERROR, nullptr, "Nạp %s thất bại: %s", path, lua_tostring(Lua, -1));
+        logmod_log(ERROR, nullptr, "Loading %s failed: %s", path, lua_tostring(Lua, -1));
     lua_pop(Lua, 1);
     return false;
 }

@@ -28,7 +28,7 @@ void on_count_message(struct discord *client, const struct discord_message *even
     struct lua_State *L = nullptr;
     
     if (lastCounter == event->author->id) {
-        params.content = _("Phát hiện 1 người đếm 2 lần liên tiếp - reset lại counter");
+        params.content = _("You wanna count twice? Nah I'd win. Resetting the counter.");
         goto send;
     }
     
@@ -41,14 +41,14 @@ void on_count_message(struct discord *client, const struct discord_message *even
     if (luaL_dostring(L, command) != LUA_OK)
     {
         params.content = vFormat(
-            _("Đầu vào không hợp lệ hoặc có lỗi xảy ra: %s"),
+            _("Invalid input or an error occured: %s"),
             lua_tostring(L, -1)
         );
         free(command);
         goto send;
     }
     else if (lua_isinteger(L, -1) != 1) {
-        params.content = _("Đầu vào không cho ra số nguyên - reset lại counter");
+        params.content = _("The input is not convertible into an integer - resetting the counter");
         free(command);
         goto send;
     }
@@ -57,7 +57,10 @@ void on_count_message(struct discord *client, const struct discord_message *even
     const auto num = lua_tointeger(L, -1);
     if ((num - countStep) != currentPosition)
     {
-        params.content = vFormat(_("Số tiếp theo phải là %u - reset lại counter"), currentPosition + 1);
+        params.content = vFormat(
+            _("The next number must be %u - resetting the counter"),
+            currentPosition + 1
+        );
         goto send;
         free(params.content);
     }

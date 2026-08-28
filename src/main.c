@@ -63,18 +63,18 @@ int main(int argc, char *argv[])
             switch (c)
             {
             case 'h':
-                printf(_("Bot Discord :white_check_mark:\nCờ khả dụng:\n"));
-                printf(_("--env-path / -e [THƯ MỤC]       Đọc [THƯ MỤC] để setup các lệnh\n"));
-                printf(_("--help     / -h                 In ra những dòng này\n"));
-                printf(_("--version  / -v                 In ra phiên bản của bot+trình biên dịch v.v..\n"));
-                printf(_("Ghé qua soc-bot(3) để biết thêm chi tiết."));
+                printf(_("A Discord bot \U00002705\nAvailable flags:\n"));
+                printf(_("--env-path / -e [PATH]          Read [PATH] for setup script\n"));
+                printf(_("--help     / -h                 Print these lines\n"));
+                printf(_("--version  / -v                 Print version of stuff\n"));
+                printf(_("Read soc-bot(3) for more infos.\n"));
                 return 0;
             case 'v':
-                printf(_("Phiên bản API Discord: %s\n"), DISCORD_VERSION);
-                printf(_("Phiên bản libcURL: %s\n"), curl_version());
+                printf(_("Discord API version: %s\n"), DISCORD_VERSION);
+                printf(_("libcURL version: %s\n"), curl_version());
                 // LUA_VERSION expands to Lua + Lua version.
                 // If that changes, fix the line.
-                printf(_("Phiên bản %s"), LUA_VERSION"\n");
+                printf(LUA_VERSION"\n");
                 return 0;
             case 'e':
                 env_path = optarg;
