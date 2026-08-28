@@ -1,14 +1,15 @@
 # candyLover
 
-> Currently most texts in this project are Vietnamese.
-> Sorry for the inconvenience - this will be fixed when the bot gets feature-complete.
+English version [here](README.en.md).
 
 Một bot Discord với đầy đủ những thứ từ nhiều bot khác:
 * Trapboy (bẫy bot)
 * Đếm số
-* Nối từ, nối cả câu
+* Nối từ
 * Blacklist từ
 * Vân vân và mây mây?
+
+Đa số sẽ có lệnh reset.
 
 ## Cài đặt
 
@@ -48,17 +49,33 @@ Chương trình được lưu ở build/soc.
 
 ## Setup
 
-TODO:tm:
-
 candyLover sử dụng Lua để setup các chức năng - không có auto-reload.
 
-candyLover chỉ load một số module của Lua:
+Chỉ có một số module của Lua là được load (có thể thay đổi tùy theo nhu cầu của bot sau này):
 * Base
 * String
 * Math
 * Table
-* Xem các section từ https://www.lua.org/manual/5.5/manual.html#6.2 để biết thêm chi tiết.
+
+Xem https://www.lua.org/manual/5.5/manual.html#6.2 để biết thêm chi tiết.
+
+Mặc định bot sẽ load ./env.lua để setup chức năng, sử dụng cờ --env-path / -e để sử dụng file khác.
 
 ### Hàm global
 
-`include(path)`: Nạp và chạy `path` ngay lập tức.
+* `include(path)`: Nạp và chạy `path` ngay lập tức;
+* Vì candyLover có load 1 số module Lua, nên các hàm từ module đó cũng có thể sử dụng;
+* Các hàm bắt đầu section bên dưới;
+* `end_section()`: kết thúc 1 section. Không bắt buộc vì:
+    - candyLover khi bắt đầu 1 section mới không quan tâm đến section trước đó
+    - Hàm của section nào sẽ chỉ chạy trong section đó, và sẽ báo lỗi khi cần
+
+### Section
+
+Có *[REDACTED]* section:
+* environment: Setup môi trường trước khi bot thực hiện công việc. Thường là đặt ID kênh, log level v.v
+* count: Tính năng đếm số, bắt đầu từ 1 số bất kì (mặc định là 1). Không ai được phép đếm 2 lần liên tiếp. Một số phép toán (cộng trừ nhân chia mũ) có thể được sử dụng (vì lý do bảo mật, không được phép chạy hàm cho đến khi có ai đủ thời gian để kiểm tra đầu vào). Mọi sai lầm đều phải trả giá:penguin:
+* trapboy: Bẫy spam. Hiện chưa có kế hoạch nào mới...
+* wordchain: Nối từ.
+
+Mọi section đều có thể được kết thúc bằng hàm *end_section()*
