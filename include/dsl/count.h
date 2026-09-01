@@ -1,5 +1,6 @@
 #pragma once
 #include <lua.h>
+#include <stdint.h>
 
 void DSL_count_init(struct lua_State *L);
 

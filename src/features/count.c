@@ -1,7 +1,7 @@
 #include "features/count.h"
 #include "discord_codecs.h"
 #include "dsl/count.h"
-#include "swiss.h"
+#include <sds.h>
 #include <stdlib.h>
 #include <libintl.h>
 #include <lualib.h>
@@ -37,15 +37,17 @@ void on_count_message(struct discord *client, const struct discord_message *even
     luaopen_math(L);
     lua_pushcfunction(L, &on_error);
 
-    const char *command = vFormat("return %s", event->content);
+    const sds command = sdscatfmt(sdsempty(), "return %s", event->content);
     if (luaL_dostring(L, command) != LUA_OK)
     {
-        params.content = vFormat(
+        params.content = sdscatfmt(
+            sdsempty(),
             _("Invalid input or an error occured: %s"),
             lua_tostring(L, -1)
         );
         free(command);
         goto send;
+        free(params.content);
     }
     else if (lua_isinteger(L, -1) != 1) {
         params.content = _("The input is not convertible into an integer - resetting the counter");
@@ -57,7 +59,8 @@ void on_count_message(struct discord *client, const struct discord_message *even
     const auto num = lua_tointeger(L, -1);
     if ((num - countStep) != currentPosition)
     {
-        params.content = vFormat(
+        params.content = sdscatfmt(
+            sdsempty(),
             _("The next number must be %u - resetting the counter"),
             currentPosition + 1
         );
@@ -72,15 +75,18 @@ void on_count_message(struct discord *client, const struct discord_message *even
 
 send:
     if (L) lua_close(L);
-    if (params.content != nullptr)
+    if (params.content != nullptr) {
         discord_create_message(client, event->channel_id, &params, nullptr);
+        free(params.content);
+    }
     // The emoji is :x:
     discord_create_reaction(client, event->channel_id, event->id, 0, "\U0000274C", nullptr);
 }
 
 void on_count_command(DISCORD_INT_EVENT_ARGS)
 {
-    const char *msg = vFormat(
+    const char *msg = sdscatfmt(
+        sdsempty(),
         "Current position: %u\n"
         "Step: %u\n"
         "First number: %u\n",

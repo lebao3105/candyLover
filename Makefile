@@ -2,13 +2,14 @@ PREFIX?=/usr
 BUILD_DIR?=build
 # Or release
 MODE?=debug
-CFLAGS=-Iinclude -I3rdparty/concord/include \
+CFLAGS=-Iinclude -I3rdparty/concord/include -I3rdparty/sds/ \
 	   -I3rdparty/concord/core -I3rdparty/concord/gencodecs \
 	   -I3rdparty/concord/generated -I3rdparty/concord/reflect-c \
 	   $(shell pkg-config --cflags libcurl) \
 	   $(shell pkg-config --cflags lua) \
 	   -Wall -Wextra -Wpedantic -std=c23 \
-	   -D_=gettext -D__STDC_WANT_LIB_EXT1__
+	   -D_=gettext -D__STDC_WANT_LIB_EXT1__ \
+	   -D_XOPEN_SOURCE=600
 LIBS=-L3rdparty/concord/lib -ldiscord \
 	 $(shell pkg-config --libs libcurl) \
 	 $(shell pkg-config --libs lua)
@@ -31,7 +32,7 @@ CFLAGS+=-O3
 endif
 
 soc: config $(OBJS)
-	$(CC) $(OBJS) -o build/soc $(LIBS)
+	$(CC) $(OBJS) 3rdparty/sds/sds.c -Wall -Wpedantic -o build/soc $(LIBS)
 
 compile_commands:
 	bear --output build/compile_commands.json -- $(MAKE) $(OBJS)

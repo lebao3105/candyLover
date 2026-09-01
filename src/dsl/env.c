@@ -1,7 +1,7 @@
 #include "dsl/dsl.h"
 #include "dsl/env.h"
-#include "swiss.h"
 
+#include <sds.h>
 #include <assert.h>
 #include <ctype.h> // toupper
 #include <stdlib.h>
@@ -72,7 +72,8 @@ u64snowflake DSL_set_integer(struct lua_State *L)
             char *errptr;
             u64snowflake result = strtoul(id, &errptr, 0);
             if (*errptr != '\0') {
-                const char *msg = vFormat(
+                const sds msg = sdscatfmt(
+                    sdsempty(),
                     _("Invalid string value: not convertible to unsigned number (error message: %s)"),
                     errptr
                 );
